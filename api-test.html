@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API连接测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background-color: #d4edda; color: #155724; }
+        .error { background-color: #f8d7da; color: #721c24; }
+        .info { background-color: #d1ecf1; color: #0c5460; }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .log {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>API连接测试</h1>
+    
+    <div class="test-item">
+        <h3>当前设备信息</h3>
+        <p><strong>User Agent:</strong> <span id="userAgent"></span></p>
+        <p><strong>当前地址:</strong> <span id="currentUrl"></span></p>
+        <p><strong>主机名:</strong> <span id="hostname"></span></p>
+    </div>
+
+    <div class="test-item">
+        <h3>API地址检测</h3>
+        <button onclick="testApiUrls()">开始检测</button>
+        <div id="apiResults"></div>
+    </div>
+
+    <div class="test-item">
+        <h3>连接日志</h3>
+        <button onclick="clearLog()">清空日志</button>
+        <div id="log" class="log"></div>
+    </div>
+
+    <script>
+        // 显示设备信息
+        document.getElementById('userAgent').textContent = navigator.userAgent;
+        document.getElementById('currentUrl').textContent = window.location.href;
+        document.getElementById('hostname').textContent = window.location.hostname;
+
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        async function testApiUrls() {
+            const resultsDiv = document.getElementById('apiResults');
+            resultsDiv.innerHTML = '<p>正在检测...</p>';
+            
+            const candidates = [
+                'http://localhost:3001/api',
+                `http://${window.location.hostname}:3001/api`,
+                'http://10.245.74.88:3001/api',
+                'http://192.168.1.100:3001/api',
+                'http://192.168.0.100:3001/api',
+            ];
+
+            let results = '';
+            let foundWorking = false;
+
+            for (const url of candidates) {
+                log(`测试 ${url}...`);
+                try {
+                    const response = await fetch(`${url}/health`, { 
+                        method: 'GET',
+                        signal: AbortSignal.timeout(3000)
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        results += `<div class="status success">✅ ${url} - 可用</div>`;
+                        log(`✅ ${url} - 可用: ${data.message}`);
+                        foundWorking = true;
+                    } else {
+                        results += `<div class="status error">❌ ${url} - HTTP ${response.status}</div>`;
+                        log(`❌ ${url} - HTTP ${response.status}`);
+                    }
+                } catch (error) {
+                    results += `<div class="status error">❌ ${url} - ${error.message}</div>`;
+                    log(`❌ ${url} - ${error.message}`);
+                }
+            }
+
+            if (foundWorking) {
+                results += '<div class="status success">🎉 找到可用的API地址！</div>';
+                log('🎉 找到可用的API地址！');
+            } else {
+                results += '<div class="status error">😞 没有找到可用的API地址</div>';
+                log('😞 没有找到可用的API地址');
+            }
+
+            resultsDiv.innerHTML = results;
+        }
+
+        // 页面加载时自动检测
+        window.onload = function() {
+            log('页面加载完成，开始自动检测...');
+            testApiUrls();
+        };
+    </script>
+</body>
+</html>
