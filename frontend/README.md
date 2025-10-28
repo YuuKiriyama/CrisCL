@@ -1,192 +1,160 @@
-# 德州扑克积分统计系统 - 前端
+# 德州扑克积分统计系统 - 前端 v0.0.1
 
-## 📦 技术栈
-
-- **框架**: React 18
-- **构建工具**: Vite
-- **样式**: Tailwind CSS
-- **状态管理**: React Hooks
+基于React + Vite的现代化前端应用，提供德州扑克游戏数据统计的用户界面。
 
 ## 🚀 快速开始
 
-### 1. 安装依赖
-
+### 安装依赖
 ```bash
 npm install
 ```
 
-### 2. 启动开发服务器
-
-#### 方式一：使用启动脚本
-```bash
-./启动开发服务器.command
-```
-
-#### 方式二：使用命令行
+### 启动开发服务器
 ```bash
 npm run dev
 ```
+访问：`http://localhost:3000`
 
-服务器将在 `http://localhost:3000` 启动
-
-### 3. 构建生产版本
-
+### 构建生产版本
 ```bash
 npm run build
 ```
 
-构建输出在 `dist/` 目录
-
-### 4. 预览生产版本
-
+### 预览生产版本
 ```bash
 npm run preview
 ```
 
-## 📁 项目结构
+## 🏗️ 技术栈
+
+- **React 18** - UI框架
+- **Vite** - 构建工具
+- **Tailwind CSS** - 样式框架
+- **React Hooks** - 状态管理
+
+## 📁 目录结构
 
 ```
-frontend/
-├── src/                      # 源代码
-│   ├── components/          # React组件
-│   │   ├── Icons.jsx       # SVG图标组件
-│   │   ├── CurrentGame.jsx # 当前游戏视图
-│   │   ├── History.jsx     # 历史记录视图
-│   │   └── PlayerDetail.jsx # 玩家详情视图
-│   ├── utils/              # 工具函数
-│   │   ├── storage.js      # API存储封装
-│   │   └── helpers.js      # 辅助函数
-│   ├── App.jsx             # 主应用组件
-│   ├── main.jsx            # 入口文件
-│   └── index.css           # 全局样式
-├── index.html              # 入口HTML
-├── package.json            # 依赖配置
-├── vite.config.js          # Vite配置
-├── tailwind.config.js      # Tailwind配置
-├── postcss.config.js       # PostCSS配置
-└── 启动开发服务器.command   # 启动脚本
+src/
+├── components/          # React组件
+│   ├── CurrentGame.jsx  # 当前游戏页面
+│   ├── History.jsx     # 历史记录页面
+│   ├── PlayerDetail.jsx # 玩家详情页面
+│   └── Icons.jsx       # SVG图标组件
+├── utils/              # 工具函数
+│   ├── storage.js      # API存储封装
+│   └── helpers.js      # 辅助函数
+├── App.jsx             # 主应用组件
+├── main.jsx            # 应用入口
+└── index.css           # 全局样式
 ```
 
-## 🔧 配置说明
+## 🔧 开发指南
 
-### 修改端口
+### 组件说明
 
-在 `vite.config.js` 中修改：
-```javascript
-export default defineConfig({
-  server: {
-    port: 3000,  // 改为你想要的端口
-    host: '0.0.0.0'
-  }
-})
-```
+**App.jsx** - 主应用组件
+- 状态管理（游戏数据、历史记录、玩家列表）
+- 视图切换逻辑
 
-### 修改后端API地址
+**CurrentGame.jsx** - 当前游戏页面
+- 游戏配置界面
+- 玩家管理
+- 盈亏计算展示
+- 游戏控制（开始/结束/保存）
 
-在 `src/utils/storage.js` 中修改：
-```javascript
-const API_BASE_URL = 'http://localhost:3001/api';
-```
+**History.jsx** - 历史记录页面
+- 历史记录列表
+- 玩家筛选
+- 统计数据展示
+- 收藏玩家管理
 
-生产环境建议使用环境变量：
-```javascript
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
-```
+**PlayerDetail.jsx** - 玩家详情页面
+- 单个玩家详细信息
+- 历史对局记录
+- 统计图表
 
-然后创建 `.env.production` 文件：
-```
-VITE_API_URL=https://your-api-domain.com/api
-```
+**Icons.jsx** - 图标组件
+- 所有SVG图标组件
+- 便于统一管理和复用
 
-## 📱 移动端访问
+### 工具函数
 
-### 局域网访问
+**storage.js** - API存储封装
+- 与后端API通信
+- 数据持久化
 
-1. 启动开发服务器后，查看控制台输出的网络地址
-2. 确保手机和电脑在同一WiFi网络
-3. 在手机浏览器输入网络地址（如 `http://192.168.31.205:3000`）
+**helpers.js** - 辅助函数
+- 日期格式化
+- 盈亏计算
+- 时长计算
+- 其他通用工具函数
 
-### PWA支持
+## 📱 移动端支持
 
-应用支持PWA，可以添加到手机主屏幕：
-1. 在手机浏览器打开应用
-2. Safari: 点击分享 -> 添加到主屏幕
-3. Chrome: 点击菜单 -> 添加到主屏幕
+- 响应式设计，自动适配各种屏幕尺寸
+- 支持触摸操作
+- 可添加到主屏幕获得App体验
+
+## 🔗 API集成
+
+前端通过HTTP API与后端通信：
+- **后端地址**: `http://localhost:3001/api`
+- **数据格式**: JSON
+- **跨域支持**: CORS已配置
+
+## 🎨 样式指南
+
+使用Tailwind CSS进行样式开发：
+- 实用优先的CSS框架
+- 响应式设计
+- 组件化样式
 
 ## 🐛 常见问题
 
-### Q: 无法连接后端？
-A: 
-1. 确保后端服务器在 `http://localhost:3001` 运行
-2. 检查浏览器控制台是否有CORS错误
-3. 检查 `src/utils/storage.js` 中的API地址
+### 1. 开发服务器启动失败
+```bash
+# 清理缓存重试
+rm -rf node_modules package-lock.json
+npm install
+```
 
-### Q: 样式没有生效？
-A: 
-1. 清除浏览器缓存
-2. 确保 Tailwind CSS 已正确配置
-3. 检查 `index.css` 是否正确导入
+### 2. 端口被占用
+修改 `vite.config.js` 中的 port 值
 
-### Q: 热更新不工作？
-A: 
-1. 重启开发服务器
-2. 检查是否有文件监听权限问题
-3. 尝试删除 `node_modules` 重新安装
+### 3. 移动端无法访问
+- 检查防火墙设置
+- 确认WiFi网络相同
+- 尝试使用本机IP地址
 
-## 📝 开发注意事项
+### 4. 修改代码不生效
+- 检查文件是否保存
+- 重启开发服务器
+- 清除浏览器缓存
 
-1. **组件拆分**: 每个组件职责单一，便于维护
-2. **Props传递**: 使用解构赋值，明确组件依赖
-3. **状态管理**: 状态提升到App组件，子组件通过props接收
-4. **API调用**: 统一在storage.js中封装，组件不直接调用API
-5. **响应式设计**: 使用Tailwind的响应式类名（sm:, md:, lg:等）
-
-## 🎨 样式规范
-
-- 使用 Tailwind CSS 工具类
-- 避免内联样式
-- 自定义样式放在 `index.css`
-- 颜色主题：
-  - 主色：绿色 (green-600)
-  - 成功：绿色 (green-50, green-600)
-  - 警告/错误：红色 (red-50, red-600)
-  - 中性：灰色 (gray-50 到 gray-800)
-
-## 🚀 部署
+## 📈 构建和部署
 
 ### 构建生产版本
-
 ```bash
 npm run build
 ```
+输出到 `dist/` 目录
 
-### 部署到静态托管平台
+### 部署选项
+- **静态托管**: Netlify, Vercel, GitHub Pages
+- **CDN**: Cloudflare, AWS CloudFront
+- **服务器**: Nginx, Apache
 
-1. **Netlify**
-   - 拖拽 `dist/` 文件夹到 Netlify
-   - 或连接 Git 仓库自动部署
+## 🔄 版本历史
 
-2. **Vercel**
-   - 连接 Git 仓库
-   - 设置构建命令: `npm run build`
-   - 设置输出目录: `dist`
+### v0.0.1
+- ✅ 初始版本发布
+- ✅ React 18 + Vite架构
+- ✅ Tailwind CSS样式
+- ✅ 响应式设计
+- ✅ 组件化开发
 
-3. **GitHub Pages**
-   ```bash
-   npm run build
-   # 将 dist/ 目录推送到 gh-pages 分支
-   ```
+---
 
-### 环境变量配置
-
-创建 `.env.production` 文件：
-```
-VITE_API_URL=https://your-backend-api.com/api
-```
-
-## 📚 相关文档
-
-- [React 文档](https://react.dev/)
-- [Vite 文档](https://vitejs.dev/)
-- [Tailwind CSS 文档](https://tailwindcss.com/)
-
+**前端应用 v0.0.1**  
+*现代化的德州扑克统计界面*

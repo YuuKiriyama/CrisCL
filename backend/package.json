@@ -1,6 +1,6 @@
 {
   "name": "poker-tracker-backend",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "德州扑克积分统计系统后端",
   "main": "server.js",
   "type": "module",
