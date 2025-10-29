@@ -51,9 +51,9 @@ function History({ history, favorites, toggleFavorite, deleteGame, setViewPlayer
     const gamesPlayed = playerGames.length;
     const avgProfit = gamesPlayed > 0 ? (totalProfit / gamesPlayed).toFixed(2) : '0.00';
     const avgProfitBB = gamesPlayed > 0 ? (totalProfitBB / gamesPlayed).toFixed(1) : '0.0';
-    const totalHours = totalMinutes / 60;
-    const hourlyProfit = totalHours > 0 ? (totalProfit / totalHours).toFixed(2) : '0.00';
-    const hourlyBB = totalHours > 0 ? (totalProfitBB / totalHours).toFixed(1) : '0.0';
+    // 精确到分钟计算每小时盈利：总盈利 * 60 / 总分钟数
+    const hourlyProfit = totalMinutes > 0 ? (totalProfit * 60 / totalMinutes).toFixed(2) : '0.00';
+    const hourlyBB = totalMinutes > 0 ? (totalProfitBB * 60 / totalMinutes).toFixed(1) : '0.0';
 
     return {
       gamesPlayed,
@@ -78,7 +78,7 @@ function History({ history, favorites, toggleFavorite, deleteGame, setViewPlayer
           {/* 收藏玩家列表 */}
           {favorites.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-2">
+              <h3 className="text-sm font-medium text-gray-700 mb-2 flex items-center gap-3">
                 <span className="w-4 h-4 text-yellow-500 fill-yellow-500"><Icons.Star /></span>
                 收藏的玩家
               </h3>
@@ -87,7 +87,7 @@ function History({ history, favorites, toggleFavorite, deleteGame, setViewPlayer
                   <button
                     key={name}
                     onClick={() => setViewPlayerDetail(name)}
-                    className="px-3 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-sm text-yellow-800 hover:bg-yellow-100 flex items-center gap-1"
+                    className="px-3 py-1 bg-yellow-50 border border-yellow-200 rounded-full text-sm text-yellow-800 hover:bg-yellow-100 flex items-center gap-2"
                   >
                     <span className="w-3 h-3"><Icons.User /></span>
                     {name}
@@ -164,11 +164,11 @@ function History({ history, favorites, toggleFavorite, deleteGame, setViewPlayer
                   <div>
                     <h4 className="text-lg font-bold text-gray-800">{game.gameName}</h4>
                     <div className="flex gap-4 text-sm text-gray-600 mt-1">
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-3">
                         <span className="w-4 h-4"><Icons.Calendar /></span>
                         {new Date(game.date).toLocaleDateString('zh-CN')}
                       </span>
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-3">
                         <span className="w-4 h-4"><Icons.Clock /></span>
                         {formatDuration(game.sessionMinutes)}
                       </span>
@@ -205,7 +205,7 @@ function History({ history, favorites, toggleFavorite, deleteGame, setViewPlayer
                             <td className="px-3 py-2">
                               <button
                                 onClick={() => setViewPlayerDetail(player.name)}
-                                className="flex items-center gap-2 hover:text-green-600 transition-colors"
+                                className="flex items-center gap-3 hover:text-green-600 transition-colors"
                               >
                                 {player.name}
                                 <button
@@ -238,7 +238,7 @@ function History({ history, favorites, toggleFavorite, deleteGame, setViewPlayer
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <button
                     onClick={() => deleteGame(game.id)}
-                    className="text-sm text-red-600 hover:text-red-800 flex items-center gap-2"
+                    className="text-sm text-red-600 hover:text-red-800 flex items-center gap-3"
                   >
                     <span className="w-4 h-4"><Icons.Trash2 /></span>
                     删除此记录

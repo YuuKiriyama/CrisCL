@@ -26,11 +26,35 @@ function App() {
   const [isOnline, setIsOnline] = useState(true);
   const [lastSyncTime, setLastSyncTime] = useState(null);
 
+  // 初始化：加载数据并恢复游戏状态
   useEffect(() => {
     loadHistory();
     loadFavorites();
-    generateGameName();
     checkConnection();
+    
+    // 尝试恢复当前游戏状态
+    const savedGameState = localStorage.getItem('currentGameState');
+    if (savedGameState) {
+      try {
+        const state = JSON.parse(savedGameState);
+        // 恢复游戏状态
+        setGameName(state.gameName || '');
+        setSmallBlind(state.smallBlind || 1);
+        setBigBlind(state.bigBlind || 2);
+        setBuyInChips(state.buyInChips || '');
+        setChipValue(state.chipValue || '');
+        setGameStatus(state.gameStatus || 'notStarted');
+        setStartTime(state.startTime ? new Date(state.startTime) : null);
+        setEndTime(state.endTime ? new Date(state.endTime) : null);
+        setPlayers(state.players || []);
+        console.log('✅ 游戏状态已恢复');
+      } catch (error) {
+        console.error('恢复游戏状态失败:', error);
+        generateGameName();
+      }
+    } else {
+      generateGameName();
+    }
     
     // 设置定期同步
     const syncInterval = setInterval(() => {
@@ -62,6 +86,28 @@ function App() {
       }
     };
   }, [gameStatus, startTime]);
+
+  // 自动保存当前游戏状态
+  useEffect(() => {
+    // 只在游戏进行中或已结束时保存状态
+    if (gameStatus !== 'notStarted') {
+      const currentGameState = {
+        gameName,
+        smallBlind,
+        bigBlind,
+        buyInChips,
+        chipValue,
+        gameStatus,
+        startTime: startTime ? startTime.toISOString() : null,
+        endTime: endTime ? endTime.toISOString() : null,
+        players,
+        savedAt: new Date().toISOString()
+      };
+      
+      localStorage.setItem('currentGameState', JSON.stringify(currentGameState));
+      console.log('💾 游戏状态已自动保存');
+    }
+  }, [gameName, smallBlind, bigBlind, buyInChips, chipValue, gameStatus, startTime, endTime, players]);
 
   const generateGameName = () => {
     const name = genGameName();
@@ -153,19 +199,25 @@ function App() {
 
   const handleSmallBlindChange = (value) => {
     const numValue = value === '' ? '' : parseInt(value);
-    if (numValue === '' || numValue <= (bigBlind || Infinity)) {
-      setSmallBlind(numValue);
-    } else {
+    setSmallBlind(numValue);
+  };
+
+  const handleSmallBlindBlur = () => {
+    if (smallBlind && bigBlind && smallBlind > bigBlind) {
       alert('小盲不能超过大盲');
+      setSmallBlind(bigBlind);
     }
   };
 
   const handleBigBlindChange = (value) => {
     const numValue = value === '' ? '' : parseInt(value);
-    if (numValue === '' || numValue >= (smallBlind || 0)) {
-      setBigBlind(numValue);
-    } else {
+    setBigBlind(numValue);
+  };
+
+  const handleBigBlindBlur = () => {
+    if (smallBlind && bigBlind && bigBlind < smallBlind) {
       alert('大盲不能低于小盲');
+      setBigBlind(smallBlind);
     }
   };
 
@@ -202,6 +254,10 @@ function App() {
     setEndTime(null);
     setPlayers([]);
     generateGameName();
+    
+    // 清除保存的游戏状态
+    localStorage.removeItem('currentGameState');
+    console.log('🗑️ 游戏状态已清除');
   };
 
   const addPlayer = () => {
@@ -234,7 +290,7 @@ function App() {
   const updatePlayerBuyIns = (playerId, value) => {
     setPlayers(players.map(p => 
       p.id === playerId 
-        ? { ...p, buyIns: value === '' ? '' : parseInt(value) || 1 }
+        ? { ...p, buyIns: value === '' ? 0 : parseInt(value) || 0 }
         : p
     ));
   };
@@ -300,6 +356,8 @@ function App() {
     const newHistory = [game, ...history];
     const success = await saveHistory(newHistory);
     if (success) {
+      // 清除保存的游戏状态（因为已经保存到历史记录）
+      localStorage.removeItem('currentGameState');
       resetGame();
       alert('游戏已保存！');
     } else {
@@ -318,7 +376,8 @@ function App() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto p-4">
         <header className="mb-6">
-          <div className="flex items-center justify-between">
+          {/* 桌面版布局 */}
+          <div className="hidden md:flex items-center justify-between">
             <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-2">
               <span className="w-8 h-8"><Icons.DollarSign /></span>
               CrisCL积分统计
@@ -342,6 +401,49 @@ function App() {
                   loadFavorites();
                 }}
                 className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors"
+                title="刷新数据并重新检测服务器"
+              >
+                刷新
+              </button>
+            </div>
+          </div>
+          
+          {/* 移动端布局 */}
+          <div className="md:hidden">
+            <div className="flex items-start justify-between gap-2">
+              {/* 左侧：标题 */}
+              <div className="flex items-start gap-2 flex-shrink-0">
+                <span className="w-6 h-6 mt-1"><Icons.DollarSign /></span>
+                <div className="flex flex-col">
+                  <h1 className="text-lg font-bold text-gray-800 leading-tight">CrisCL积分统计</h1>
+                  <h2 className="text-xs font-bold text-gray-600 leading-tight">我们Cris才是真正的CL</h2>
+                </div>
+              </div>
+              
+              {/* 中间：状态信息 */}
+              <div className="flex flex-col items-center flex-shrink-0 text-xs">
+                <div className="flex items-center gap-1">
+                  <div className={`w-2 h-2 rounded-full ${isOnline ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <span className={isOnline ? 'text-green-600' : 'text-red-600'}>
+                    {isOnline ? '在线' : '离线'}
+                  </span>
+                </div>
+                {lastSyncTime && (
+                  <span className="text-gray-500 text-[10px] whitespace-nowrap">
+                    {new Date(lastSyncTime).toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
+              
+              {/* 右侧：刷新按钮 */}
+              <button
+                onClick={() => {
+                  storage.resetApiUrl();
+                  checkConnection();
+                  loadHistory();
+                  loadFavorites();
+                }}
+                className="px-2 py-1 text-xs bg-blue-100 text-blue-600 rounded hover:bg-blue-200 transition-colors flex-shrink-0"
                 title="刷新数据并重新检测服务器"
               >
                 刷新
@@ -384,8 +486,10 @@ function App() {
             setGameName={setGameName}
             smallBlind={smallBlind}
             handleSmallBlindChange={handleSmallBlindChange}
+            handleSmallBlindBlur={handleSmallBlindBlur}
             bigBlind={bigBlind}
             handleBigBlindChange={handleBigBlindChange}
+            handleBigBlindBlur={handleBigBlindBlur}
             buyInChips={buyInChips}
             setBuyInChips={setBuyInChips}
             chipValue={chipValue}
@@ -404,6 +508,7 @@ function App() {
             startGame={startGame}
             endGame={endGame}
             saveGame={saveGame}
+            resetGame={resetGame}
           />
         )}
 

@@ -5,7 +5,7 @@ export const generateGameName = () => {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, '0');
   const day = String(now.getDate()).padStart(2, '0');
-  const year = now.getFullYear();
+  const year = String(now.getFullYear()).slice(-2); // 取年份后两位
   const weekdays = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
   const weekday = weekdays[now.getDay()];
   return `${month}/${day}/${year} ${weekday}`;
