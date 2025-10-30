@@ -316,6 +316,24 @@ chmod +x frontend/*.command
 - [ ] 实时对局同步
 - [ ] PWA离线支持
 
+## 📦 Lite 版本（无需后端，PWA）
+
+已新增 `apps/lite`：
+
+- 特性：本地运行、可添加到主屏幕、离线可用；仅支持单局临时记录（不含历史存储）
+- 功能：一人创建游戏，记录所有玩家的买入手数与最终码量，自动统计盈亏（筹码与美元）
+- 启动：
+  ```bash
+  cd apps/lite
+  npm install
+  npm run dev        # 开发
+  npm run build      # 构建
+  npm run preview    # 预览（默认5174端口）
+  ```
+  预览地址：`http://localhost:5174`
+
+移动端可通过浏览器菜单选择“添加到主屏幕”安装为App图标，首次打开后支持离线使用。
+
 ## 🤝 贡献
 
 欢迎提交Issue和Pull Request！
